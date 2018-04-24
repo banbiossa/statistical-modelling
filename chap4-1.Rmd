@@ -1,0 +1,104 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+# What to do 
+- try making the AIC from scratch
+
+```{r libray}
+require(tidyverse)
+
+```
+
+
+```{r whole thing}
+s = rpois(50,8)
+fit = glm(s ~ 1, family = poisson)
+coef = fit$coefficients
+
+coef
+```
+
+```{r the 200 50 matrix}
+m.data = data.frame(matrix(rpois(200*50, 8), nrow = 200))
+m.data = m.data %>%
+        mutate(row_number = row_number()) %>%
+        select(row_number, everything())
+m.data
+
+loglik_fun = function(df, coef) sum(log(dpois(as.numeric(df), lambda = exp(coef))))
+loglik_fun(s, coef)
+
+m.data = m.data %>%
+        group_by(row_number) %>%
+        nest() %>%
+        mutate(coef = coef) %>%
+        mutate(log_lik = map2_dbl(data, coef, loglik_fun))
+
+m.data
+m.data %>%
+        summarise(mean_log_lik = mean(log_lik), coef = mean(coef)) %>%
+        mutate(max_log_lik = loglik_fun(s, coef), 
+               diff = max_log_lik - mean_log_lik)
+
+
+```
+
+# make 200 coefs
+```{r cuts}
+
+c.data = data.frame(matrix(rpois(200*50, 8), nrow = 200))
+c.data = c.data %>%
+        mutate(row_number = row_number()) %>%
+        select(row_number, everything())
+
+fit_glm = function(data) glm(as.numeric(data) ~ 1, family = poisson)
+b_fun = function(mod) coefficients(mod)[[1]]
+
+c.data = c.data %>%
+        group_by(row_number) %>%
+        nest() %>%
+        mutate(fit = map(data, fit_glm),
+               coef = map_dbl(fit, b_fun)) %>%
+        mutate(cut_number = row_number-1) %>%
+        select(cut_number, coef)
+
+c.data
+
+```
+
+
+
+```{r the 200 50 200 matrix}
+m.data = data.frame(matrix(rpois(200*50*200, 8), ncol = 50))
+m.data = m.data %>%
+        mutate(row_number = row_number(),
+               cut_number = (row_number-1) %/% 200) %>%
+        select(row_number, cut_number, everything())
+
+m.data = left_join(c.data, m.data)
+m.data
+
+loglik_fun = function(df, coef) sum(log(dpois(as.numeric(df), lambda = exp(coef))))
+loglik_fun(s, coef)
+
+m.data = m.data %>%
+        group_by(row_number) %>%
+        nest() %>%
+        mutate(log_lik = map2_dbl(data, coef, loglik_fun))
+
+m.data
+m.data %>%
+        summarise(mean_log_lik = mean(log_lik), coef = mean(coef)) %>%
+        mutate(max_log_lik = loglik_fun(s, coef), 
+               diff = max_log_lik - mean_log_lik)
+
+
+```
+
+
+
+
+

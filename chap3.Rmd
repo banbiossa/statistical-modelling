@@ -1,0 +1,104 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r load}
+d = read.csv("data3a.csv")
+d
+
+```
+
+```{r look at}
+summary(d)
+
+qplot(x, y, data = d, pch = f)
+```
+
+
+```{r fit}
+fit = glm(y ~ x, data = d, family = poisson)
+fit
+
+summary(fit)
+```
+
+```{r how good is the fit}
+logLik(fit)
+
+
+```
+
+```{r prediction}
+{
+plot(d$x, d$y, pch = c(21,19)[d$f])
+xx = seq(min(d$x), max(d$x), length = 100)
+yy = predict(fit, newdata = data.frame(x = xx), type = "response")
+lines(xx, yy, lwd = 2)
+}
+
+```
+
+```{r fits with f}
+fit.f = glm(y ~ f, data = d, family = poisson)
+summary(fit.f)
+
+```
+
+```{r all}
+fit.all = glm(y ~ x + f, data = d, family = poisson)
+summary(fit.all)
+
+```
+
+```{r identity}
+fit.iden = glm(y ~ x + f, data = d, family = poisson(link = "identity"))
+summary(fit.iden)
+
+```
+
+
+# Plot new data
+```{r calculate}
+summary(d)
+
+require(caret)
+require(tidyverse)
+
+newdata = expand.grid(x = seq(min(d$x), max(d$x), by = 0.1), f = factor(c("C","T")))
+summary(newdata)
+
+# apply predict(fit.all) using purrr
+do_prediction = function(x_element, f_element){
+        prediction = predict(fit.all, newdata = data.frame(x = x_element, f = f_element), type = "response")
+        return(prediction)
+}
+
+newdata = newdata %>%
+        mutate(p_all = map2_dbl(x, f, do_prediction))
+newdata$p_iden = predict(fit.iden, newdata = newdata, type = "response")
+newdata
+```
+
+```{r plot}
+qplot(x, p_all, data = newdata, color = f, ylim =c(5,10))
+qplot(x, p_iden, data = newdata, color = f, ylim =c(5,10))
+
+```
+
+
+```{r plot}
+# plot 
+
+
+predict(fit.all, newdata =, type = "response") 
+
+
+
+```
+
+
+
+

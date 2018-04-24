@@ -1,0 +1,59 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup}
+library(ggplot2)
+N = 1000
+y = rnorm(N, mean = 172, sd = 5.5)
+qplot(y, bins = 15)
+
+```
+
+```{r stan}
+library(rstan)
+normal_data = list(N = N, y = y)
+
+fit_normal = 
+        stan(
+                file = "normal.stan",
+                data = normal_data,
+                chains = 4,
+                thin = 1
+        )
+
+```
+
+```{r output}
+traceplot(fit_normal)
+plot(fit_normal)
+print(fit_normal)
+
+param_normal = extract(fit_normal)
+mean(param_normal$mu)
+```
+
+```{r shinystan}
+library(shinystan)
+sso_normal = launch_shinystan(fit_normal)
+
+```
+
+```{r bayseian}
+logistic = function(x){1.0/(1+exp(-x))}
+N = 100
+M = 10
+alpha = 0.85
+sigma = 4
+
+beta = rnorm(N, mean = 0, sd = sigma)
+z = alpha + beta
+p = logistic(z)
+y = sapply(p, function(P){rbinom(1,M,P)})
+
+data_hier = list(N = length(y), M = 10, y = y)
+fit_hier = stan(file = "bayes.stan", data = data_hier)
+
+```
+

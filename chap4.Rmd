@@ -1,0 +1,83 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r load}
+d = read.csv("data3a.csv")
+d
+load("data.RData")
+
+```
+
+```{r fit}
+fit.all = glm(y ~ x +f, data = d, family = poisson)
+summary(fit.all)
+
+```
+
+
+## Minimum deviance
+```{r deviance}
+sum(log(dpois(d$y, lambda = d$y))) * -2
+
+```
+
+
+## Null deviance
+- just the beta_0
+```{r null}
+fit.null = glm(y ~ 1, data = d, family = poisson)
+summary(fit.null)
+logLik(fit.null) * -2
+
+```
+
+
+# What is AIC
+- for the data, fit a null model
+- we make a model pois, lambda = 8, 200 sets of 50 data points
+- check that the logLik is smaller by 1, on average
+
+```{r aic simulation}
+s = rpois(50, 8)
+fit.null = glm(s ~ 1, family = poisson)
+beta_i = fit.null$coefficients
+
+summary(fit.null)
+logLik(fit.null)
+
+
+sum(log(dpois(m.data[,1], exp(2.04))))
+
+
+```
+
+```{r using purrr}
+data.m = as.data.frame(t(m.data))
+data.m = data.m %>%
+        mutate(row_number = row_number()) %>%
+        select(row_number, everything())
+data.m
+loglik_fun = function(df) sum(log(dpois(as.numeric(df), lambda = exp(2.04))))
+loglik_fun(as.numeric(data.m[3,]))
+
+data.nested = data.m %>%
+        group_by(row_number) %>%
+        nest() %>%
+        mutate(log_lik = map_dbl(data, loglik_fun),
+               mean_loglik = mean(log_lik),
+               bias = -120.6 - mean_loglik)
+data.nested
+plot(density(data.nested$bias)) + abline(a = mean(data.nested$bias))
+
+data.nested %>%
+        summarise(mean(log_lik))
+
+qplot(v.mle-mean(v.mle))
+
+
+```
+

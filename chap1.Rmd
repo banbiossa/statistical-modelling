@@ -1,0 +1,44 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# About
+- chapter2 of the Green book
+```{r load}
+require(tidyverse)
+load("chap1_data.RData")
+```
+
+```{r head}
+head(data)
+table(data)
+summary(data)
+qplot(data)
+```
+
+```{r example}
+var(data)
+sd(data)
+mean(data)
+
+```
+
+
+# Pois
+- for example, let's say this data was a poisson data, with mean 3.56
+```{r pois}
+y = 0:9
+prob = dpois(y, lambda = 3.56)
+qplot(y, prob)
+
+```
+
+```{r likelyhoods}
+logL = function(m) sum(dpois(data, m, log = TRUE))
+lambda = seq(2,5,0.1)
+plot(lambda, sapply(lambda, logL), type = "l")
+```
+
+
+
