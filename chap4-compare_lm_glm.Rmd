@@ -1,0 +1,109 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+# What to do 
+- make a random sample from the poisson family
+- make two models, one lm  one glm, and compare the results of prediction
+
+```{r libray}
+require(tidyverse)
+
+```
+
+
+```{r whole thing}
+d = read.csv("data3a.csv")
+head(d)
+
+train = d[c(1:40, 51:90),]
+test = d[c(41:50, 91:100),]
+head(train)
+
+fit_glm1 = glm(y~ ., data = train, family = poisson)
+fit_glm2 = glm(y~ ., data = train, family = poisson(link = "identity"))
+fit_lm =   glm(y ~ .,data = train, family = gaussian)
+?glm
+str(d)
+```
+
+```{r qplot}
+head(d)
+qplot(x, y, data = d, colour = f)
+```
+
+
+```{r look inside}
+fit_glm1
+```
+
+```{r fitglm1}
+x = seq(7, 13, by = 0.1)
+f = factor(c("C", "T"))
+
+df = expand.grid(x = x, f = f)
+head(df)
+
+df$glm1= predict.glm(fit_glm1, newdata = df, type = "response")
+df$glm2= predict.glm(fit_glm2, newdata = df, type = "response")
+df$lm = predict.glm(fit_lm, newdata = df, type = "response")
+?predict.glm
+
+qplot(x, y, data = train, colour = f) + 
+        geom_line(aes(x = x, y = glm1, colour = f), data = df)
+        
+qplot(x, y, data = train, colour = f) + 
+        geom_line(aes(x = x, y = glm2, colour = f), data = df)
+
+qplot(x, y, data = train, colour = f) + 
+        geom_line(aes(x = x, y = lm, colour = f), data = df)
+```
+
+
+```{r}
+fit_glm2
+```
+
+```{r}
+fit_lm
+```
+
+
+# Predict
+```{r predict}
+
+qplot(x, y, data = test, colour = f) + 
+        geom_line(aes(x = x, y = glm1, colour = f), data = df)
+        
+qplot(x, y, data = test, colour = f) + 
+        geom_line(aes(x = x, y = glm2, colour = f), data = df)
+
+qplot(x, y, data = test, colour = f) + 
+        geom_line(aes(x = x, y = lm, colour = f), data = df)
+
+```
+
+# Measure
+```{r meassure}
+test$glm1 = predict.glm(fit_glm1, newdata = test, type = "response")
+test$glm2 = predict.glm(fit_glm2, newdata = test, type = "response")
+test$lm = predict.glm(fit_lm, newdata = test, type = "response")
+test
+```
+
+## reshape
+```{r reshape}
+require(Metrics)
+test %>%
+        gather(fit, y_pred, -y, -x, -f) %>%
+        mutate(diff = y - y_pred) %>%
+        group_by(fit) %>%
+        summarise(abs_diff = sum(abs(diff)), 
+                  rmse = rmse(y, y_pred), 
+                  cor = cor(y, y_pred),
+                  r_square = cor**2)
+
+```
+

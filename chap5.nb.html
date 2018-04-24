@@ -143,7 +143,7 @@ $(document).ready(function () {
 </style>
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("chap4.Rmd");
+  window.initializeSourceEmbed("chap5.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
@@ -173,101 +173,113 @@ $(document).ready(function () {
 
 
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0LmFsbCA9IGdsbSh5IH4geCArZiwgZGF0YSA9IGQsIGZhbWlseSA9IHBvaXNzb24pXG5zdW1tYXJ5KGZpdC5hbGwpXG5cbmBgYCJ9 -->
-<pre class="r"><code>fit.all = glm(y ~ x +f, data = d, family = poisson)
-summary(fit.all)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="minimum-deviance" class="section level2">
-<h2>Minimum deviance</h2>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKGxvZyhkcG9pcyhkJHksIGxhbWJkYSA9IGQkeSkpKSAqIC0yXG5cbmBgYCJ9 -->
-<pre class="r"><code>sum(log(dpois(d$y, lambda = d$y))) * -2
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="null-deviance" class="section level2">
-<h2>Null deviance</h2>
+<div id="what-happens" class="section level1">
+<h1>What happens</h1>
 <ul>
-<li>just the beta_0</li>
+<li>check if using x as a variables is useful</li>
+<li>bootstrap + chisq to check the results</li>
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0Lm51bGwgPSBnbG0oeSB+IDEsIGRhdGEgPSBkLCBmYW1pbHkgPSBwb2lzc29uKVxuc3VtbWFyeShmaXQubnVsbClcbmxvZ0xpayhmaXQubnVsbCkgKiAtMlxuXG5gYGAifQ== -->
-<pre class="r"><code>fit.null = glm(y ~ 1, data = d, family = poisson)
-summary(fit.null)
-logLik(fit.null) * -2
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibmNvbCI6MywibnJvdyI6MTAwfSwicmRmIjoiSDRzSUFBQUFBQUFBQnQxVnIzTVRRUlRlM0k4bXVmUUhNOFF3dzVUZTdWNFNUQVExbU03c0FETkZZTnBoaG9xYW8wbVlEa2V1VGNPdlltcXFhekJGWUlwQTFXQnFNQ0F3UmFCcU1EV1lJakJGSUFxN3Q5OEx5dzEvUVhmbWRkKytmZTk3MzdlNzZTM2VXcm9XTEFXTU1ZZTVuc3NjVjdtZW8vNlVtTWVxZW43R21IdFJPWHBuUWxsSDJaaGw0OG8wZ0tlc2Fsa04rNEUxNjFnRldIcjJZUjcyZkN0Zld4bFlMdUlPMWdGeWExYnZDdmJHTGI5aVlRVXd5dEd4eVVJZjI1K3c1akt3QXZoVVB3VnVudFdqQWl1RDQ1akZ4KzVCT211V1ViNW4rYjUxVnJZbTZsR0ZqbzZjZVgyd2NMSjlSVWJIOC92MXpXUEpXVDVreEkrQ3ViVTNVcWpkNllORk9iTm4xdkgxUENERnRLbmpYMXVuSDNhV3BhRDVBUHQzRHRYNExHTmR0bmNrdzNlemVzZ0k2d1p3WnZKbElKdW9EeS90cXZGS1hsYUwxdWxIeWQvcThGVVp2OXpVREdYNFNkTzhMVVc3cmdPeWVjUGtpWWNLYmVHN2pMNzE5SkFDZWtpWDBEQ3RueklpbnRBamdCK1M3aTlHYjNoaThQZzl3MWRzNTRKSCtwcTdobWRNK0Z1bVBzeHB2cEFDOWRGN0xXOU9jc1JEOEtPOEJuaEVxQmZ6UmwrRWMrRFFHNkovcTI3T2dZTW4zOGM1b0EvZFY0UzRBUC80bCtrWEpZWnZUSEh3aktrZjdSUCtyTG0zRnZCajlHOUFmK3ZRM0xOWU51ZktwM0pIQ3VocmdqZkhQUXZrYy9RVndHa0NkL1ErZGd3T2YyenVMY2FhN2puMkRXNk1mWHBmalo0NVgwNzNCRndCWGsyOHF3anZNeVJlNEJ1amp2L1FjdGZWVDVYK2Y1WE9pVG5udy83NTRJeWwzU2ZkZEVONUYvSmRmSVp1a25PM2tPK3ZwTWtHcFk5QWVzbktNQnNvNzZ5WTNrOGVkU25kSmREbmY3OTJjSHFGdXVvZ2U5cW1XdjJPbkMyV2o0NUpkSDhYS0FTZFpKaTBld05WOGg4YTVXeHR1SnIxRlppalA2NStvYmcwS0FTOE5FdjB5dzF3OHd3c1NvYkJ5SGROSDQvWStIUWczZjZEMVg2WERpRk43bmRUTENhVnNseFllMjJ3Mmg4U2ZSWGRhQSt6WVVKNXdVcVdVaVFYeE03K0FPUE5KREkvQ0FBQSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["y"],"name":[1],"type":["int"],"align":["right"]},{"label":["x"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["f"],"name":[3],"type":["fctr"],"align":["left"]}],"data":[{"1":"6","2":"8.31","3":"C"},{"1":"6","2":"9.44","3":"C"},{"1":"6","2":"9.50","3":"C"},{"1":"12","2":"9.07","3":"C"},{"1":"10","2":"10.16","3":"C"},{"1":"4","2":"8.32","3":"C"},{"1":"9","2":"10.61","3":"C"},{"1":"9","2":"10.06","3":"C"},{"1":"9","2":"9.93","3":"C"},{"1":"11","2":"10.43","3":"C"},{"1":"6","2":"10.36","3":"C"},{"1":"10","2":"10.15","3":"C"},{"1":"6","2":"10.92","3":"C"},{"1":"10","2":"8.85","3":"C"},{"1":"11","2":"9.42","3":"C"},{"1":"8","2":"11.11","3":"C"},{"1":"3","2":"8.02","3":"C"},{"1":"8","2":"11.93","3":"C"},{"1":"5","2":"8.55","3":"C"},{"1":"5","2":"7.19","3":"C"},{"1":"4","2":"9.83","3":"C"},{"1":"11","2":"10.79","3":"C"},{"1":"5","2":"8.89","3":"C"},{"1":"10","2":"10.09","3":"C"},{"1":"6","2":"11.63","3":"C"},{"1":"6","2":"10.21","3":"C"},{"1":"7","2":"9.45","3":"C"},{"1":"9","2":"10.44","3":"C"},{"1":"3","2":"9.44","3":"C"},{"1":"10","2":"10.48","3":"C"},{"1":"2","2":"9.43","3":"C"},{"1":"9","2":"10.32","3":"C"},{"1":"10","2":"10.33","3":"C"},{"1":"5","2":"8.50","3":"C"},{"1":"11","2":"9.41","3":"C"},{"1":"10","2":"8.96","3":"C"},{"1":"4","2":"9.67","3":"C"},{"1":"8","2":"10.26","3":"C"},{"1":"9","2":"10.36","3":"C"},{"1":"12","2":"11.80","3":"C"},{"1":"8","2":"10.94","3":"C"},{"1":"9","2":"10.25","3":"C"},{"1":"8","2":"8.74","3":"C"},{"1":"6","2":"10.46","3":"C"},{"1":"6","2":"9.37","3":"C"},{"1":"10","2":"9.74","3":"C"},{"1":"10","2":"8.95","3":"C"},{"1":"9","2":"8.74","3":"C"},{"1":"12","2":"11.32","3":"C"},{"1":"6","2":"9.25","3":"C"},{"1":"14","2":"10.14","3":"T"},{"1":"6","2":"9.05","3":"T"},{"1":"7","2":"9.89","3":"T"},{"1":"9","2":"8.76","3":"T"},{"1":"6","2":"12.04","3":"T"},{"1":"7","2":"9.91","3":"T"},{"1":"9","2":"9.84","3":"T"},{"1":"13","2":"11.87","3":"T"},{"1":"9","2":"10.16","3":"T"},{"1":"13","2":"9.34","3":"T"},{"1":"7","2":"10.17","3":"T"},{"1":"8","2":"10.99","3":"T"},{"1":"10","2":"9.19","3":"T"},{"1":"7","2":"10.67","3":"T"},{"1":"12","2":"10.96","3":"T"},{"1":"6","2":"10.55","3":"T"},{"1":"15","2":"9.69","3":"T"},{"1":"3","2":"10.91","3":"T"},{"1":"4","2":"9.60","3":"T"},{"1":"6","2":"12.37","3":"T"},{"1":"10","2":"10.54","3":"T"},{"1":"8","2":"11.30","3":"T"},{"1":"8","2":"12.40","3":"T"},{"1":"7","2":"10.18","3":"T"},{"1":"5","2":"9.53","3":"T"},{"1":"6","2":"10.24","3":"T"},{"1":"8","2":"11.76","3":"T"},{"1":"9","2":"9.52","3":"T"},{"1":"9","2":"10.40","3":"T"},{"1":"6","2":"9.96","3":"T"},{"1":"7","2":"10.30","3":"T"},{"1":"10","2":"11.54","3":"T"},{"1":"6","2":"9.42","3":"T"},{"1":"11","2":"11.28","3":"T"},{"1":"11","2":"9.73","3":"T"},{"1":"11","2":"10.78","3":"T"},{"1":"5","2":"10.21","3":"T"},{"1":"6","2":"10.51","3":"T"},{"1":"4","2":"10.73","3":"T"},{"1":"5","2":"8.85","3":"T"},{"1":"6","2":"11.20","3":"T"},{"1":"5","2":"9.86","3":"T"},{"1":"8","2":"11.54","3":"T"},{"1":"5","2":"10.03","3":"T"},{"1":"9","2":"11.88","3":"T"},{"1":"8","2":"9.15","3":"T"},{"1":"6","2":"8.52","3":"T"},{"1":"8","2":"10.24","3":"T"},{"1":"7","2":"10.86","3":"T"},{"1":"9","2":"9.97","3":"T"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[100]},"pages":{}}}
+  </script>
 </div>
-<div id="what-is-aic" class="section level1">
-<h1>What is AIC</h1>
-<ul>
-<li>for the data, fit a null model</li>
-<li>we make a model pois, lambda = 8, 200 sets of 50 data points</li>
-<li>check that the logLik is smaller by 1, on average</li>
-</ul>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucyA9IHJwb2lzKDUwLCA4KVxuZml0Lm51bGwgPSBnbG0ocyB+IDEsIGZhbWlseSA9IHBvaXNzb24pXG5iZXRhX2kgPSBmaXQubnVsbCRjb2VmZmljaWVudHNcblxuc3VtbWFyeShmaXQubnVsbClcbmxvZ0xpayhmaXQubnVsbClcblxuXG5zdW0obG9nKGRwb2lzKG0uZGF0YVssMV0sIGV4cCgyLjA0KSkpKVxuXG5cbmBgYCJ9 -->
-<pre class="r"><code>s = rpois(50, 8)
-fit.null = glm(s ~ 1, family = poisson)
-beta_i = fit.null$coefficients
-
-summary(fit.null)
-logLik(fit.null)
-
-
-sum(log(dpois(m.data[,1], exp(2.04))))
-</code></pre>
-<!-- rnb-source-end -->
+<!-- rnb-frame-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YS5tID0gYXMuZGF0YS5mcmFtZSh0KG0uZGF0YSkpXG5kYXRhLm0gPSBkYXRhLm0gJT4lXG4gICAgICAgIG11dGF0ZShyb3dfbnVtYmVyID0gcm93X251bWJlcigpKSAlPiVcbiAgICAgICAgc2VsZWN0KHJvd19udW1iZXIsIGV2ZXJ5dGhpbmcoKSlcbmRhdGEubVxubG9nbGlrX2Z1biA9IGZ1bmN0aW9uKGRmKSBzdW0obG9nKGRwb2lzKGFzLm51bWVyaWMoZGYpLCBsYW1iZGEgPSBleHAoMi4wNCkpKSlcbmxvZ2xpa19mdW4oYXMubnVtZXJpYyhkYXRhLm1bMyxdKSlcblxuZGF0YS5uZXN0ZWQgPSBkYXRhLm0gJT4lXG4gICAgICAgIGdyb3VwX2J5KHJvd19udW1iZXIpICU+JVxuICAgICAgICBuZXN0KCkgJT4lXG4gICAgICAgIG11dGF0ZShsb2dfbGlrID0gbWFwX2RibChkYXRhLCBsb2dsaWtfZnVuKSxcbiAgICAgICAgICAgICAgIG1lYW5fbG9nbGlrID0gbWVhbihsb2dfbGlrKSxcbiAgICAgICAgICAgICAgIGJpYXMgPSAtMTIwLjYgLSBtZWFuX2xvZ2xpaylcbmRhdGEubmVzdGVkXG5wbG90KGRlbnNpdHkoZGF0YS5uZXN0ZWQkYmlhcykpICsgYWJsaW5lKGEgPSBtZWFuKGRhdGEubmVzdGVkJGJpYXMpKVxuXG5kYXRhLm5lc3RlZCAlPiVcbiAgICAgICAgc3VtbWFyaXNlKG1lYW4obG9nX2xpaykpXG5cbnFwbG90KHYubWxlLW1lYW4odi5tbGUpKVxuXG5cbmBgYCJ9 -->
-<pre class="r"><code>data.m = as.data.frame(t(m.data))
-data.m = data.m %&gt;%
-        mutate(row_number = row_number()) %&gt;%
-        select(row_number, everything())
-data.m
-loglik_fun = function(df) sum(log(dpois(as.numeric(df), lambda = exp(2.04))))
-loglik_fun(as.numeric(data.m[3,]))
-
-data.nested = data.m %&gt;%
-        group_by(row_number) %&gt;%
-        nest() %&gt;%
-        mutate(log_lik = map_dbl(data, loglik_fun),
-               mean_loglik = mean(log_lik),
-               bias = -120.6 - mean_loglik)
-data.nested
-plot(density(data.nested$bias)) + abline(a = mean(data.nested$bias))
-
-data.nested %&gt;%
-        summarise(mean(log_lik))
-
-qplot(v.mle-mean(v.mle))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShmaXQxKVxuXG5gYGAifQ== -->
+<pre class="r"><code>summary(fit1)
 </code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxuZ2xtKGZvcm11bGEgPSB5IH4gMSwgZmFtaWx5ID0gcG9pc3NvbiwgZGF0YSA9IGQpXG5cbkRldmlhbmNlIFJlc2lkdWFsczogXG4gICAgIE1pbiAgICAgICAgMVEgICAgTWVkaWFuICAgICAgICAzUSAgICAgICBNYXggIFxuLTIuNDkwMTMgIC0wLjY4MjMyICAgMC4wNjA1NCAgIDAuNzQzMjcgICAyLjI3MjE0ICBcblxuQ29lZmZpY2llbnRzOlxuICAgICAgICAgICAgRXN0aW1hdGUgU3RkLiBFcnJvciB6IHZhbHVlIFByKD58enwpICAgIFxuKEludGVyY2VwdCkgIDIuMDU3OTYgICAgMC4wMzU3NCAgIDU3LjU5ICAgPDJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cbihEaXNwZXJzaW9uIHBhcmFtZXRlciBmb3IgcG9pc3NvbiBmYW1pbHkgdGFrZW4gdG8gYmUgMSlcblxuICAgIE51bGwgZGV2aWFuY2U6IDg5LjUwNyAgb24gOTkgIGRlZ3JlZXMgb2YgZnJlZWRvbVxuUmVzaWR1YWwgZGV2aWFuY2U6IDg5LjUwNyAgb24gOTkgIGRlZ3JlZXMgb2YgZnJlZWRvbVxuQUlDOiA0NzcuMjlcblxuTnVtYmVyIG9mIEZpc2hlciBTY29yaW5nIGl0ZXJhdGlvbnM6IDRcbiJ9 -->
+<pre><code>
+Call:
+glm(formula = y ~ 1, family = poisson, data = d)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-2.49013  -0.68232   0.06054   0.74327   2.27214  
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  2.05796    0.03574   57.59   &lt;2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 89.507  on 99  degrees of freedom
+Residual deviance: 89.507  on 99  degrees of freedom
+AIC: 477.29
+
+Number of Fisher Scoring iterations: 4</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0MSRkZXZpYW5jZSAtIGZpdDIkZGV2aWFuY2VcblxuYGBgIn0= -->
+<pre class="r"><code>fit1$deviance - fit2$deviance
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQuNTEzOTQxXG4ifQ== -->
+<pre><code>[1] 4.513941</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="bootstrap" class="section level1">
+<h1>Bootstrap</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="result" class="section level1">
+<h1>result</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucXVhbnRpbGUoZGQxMiwgMC45NSlcblxuYGBgIn0= -->
+<pre class="r"><code>quantile(dd12, 0.95)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICA5NSUgXG4zLjY0Mjk0MSBcbiJ9 -->
+<pre><code>     95% 
+3.642941 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="chisq" class="section level1">
+<h1>Chisq</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYW5vdmEoZml0MSwgZml0MiwgdGVzdCA9IFwiQ2hpc3FcIilcblxuYGBgIn0= -->
+<pre class="r"><code>anova(fit1, fit2, test = &quot;Chisq&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiQW5hbHlzaXMgb2YgRGV2aWFuY2UgVGFibGVcblxuTW9kZWwgMTogeSB+IDFcbk1vZGVsIDI6IHkgfiB4XG4gIFJlc2lkLiBEZiBSZXNpZC4gRGV2IERmIERldmlhbmNlIFByKD5DaGkpICBcbjEgICAgICAgIDk5ICAgICA4OS41MDcgICAgICAgICAgICAgICAgICAgICAgIFxuMiAgICAgICAgOTggICAgIDg0Ljk5MyAgMSAgIDQuNTEzOSAgMC4wMzM2MiAqXG4tLS1cblNpZ25pZi4gY29kZXM6ICAwIOKAmCoqKuKAmSAwLjAwMSDigJgqKuKAmSAwLjAxIOKAmCrigJkgMC4wNSDigJgu4oCZIDAuMSDigJgg4oCZIDFcbiJ9 -->
+<pre><code>Analysis of Deviance Table
+
+Model 1: y ~ 1
+Model 2: y ~ x
+  Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)  
+1        99     89.507                       
+2        98     84.993  1   4.5139  0.03362 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQoNCg0KYGBge3IgbG9hZH0NCmQgPSByZWFkLmNzdigiZGF0YTNhLmNzdiIpDQpkDQpsb2FkKCJkYXRhLlJEYXRhIikNCg0KYGBgDQoNCmBgYHtyIGZpdH0NCmZpdC5hbGwgPSBnbG0oeSB+IHggK2YsIGRhdGEgPSBkLCBmYW1pbHkgPSBwb2lzc29uKQ0Kc3VtbWFyeShmaXQuYWxsKQ0KDQpgYGANCg0KDQojIyBNaW5pbXVtIGRldmlhbmNlDQpgYGB7ciBkZXZpYW5jZX0NCnN1bShsb2coZHBvaXMoZCR5LCBsYW1iZGEgPSBkJHkpKSkgKiAtMg0KDQpgYGANCg0KDQojIyBOdWxsIGRldmlhbmNlDQotIGp1c3QgdGhlIGJldGFfMA0KYGBge3IgbnVsbH0NCmZpdC5udWxsID0gZ2xtKHkgfiAxLCBkYXRhID0gZCwgZmFtaWx5ID0gcG9pc3NvbikNCnN1bW1hcnkoZml0Lm51bGwpDQpsb2dMaWsoZml0Lm51bGwpICogLTINCg0KYGBgDQoNCg0KIyBXaGF0IGlzIEFJQw0KLSBmb3IgdGhlIGRhdGEsIGZpdCBhIG51bGwgbW9kZWwNCi0gd2UgbWFrZSBhIG1vZGVsIHBvaXMsIGxhbWJkYSA9IDgsIDIwMCBzZXRzIG9mIDUwIGRhdGEgcG9pbnRzDQotIGNoZWNrIHRoYXQgdGhlIGxvZ0xpayBpcyBzbWFsbGVyIGJ5IDEsIG9uIGF2ZXJhZ2UNCg0KYGBge3IgYWljIHNpbXVsYXRpb259DQpzID0gcnBvaXMoNTAsIDgpDQpmaXQubnVsbCA9IGdsbShzIH4gMSwgZmFtaWx5ID0gcG9pc3NvbikNCmJldGFfaSA9IGZpdC5udWxsJGNvZWZmaWNpZW50cw0KDQpzdW1tYXJ5KGZpdC5udWxsKQ0KbG9nTGlrKGZpdC5udWxsKQ0KDQoNCnN1bShsb2coZHBvaXMobS5kYXRhWywxXSwgZXhwKDIuMDQpKSkpDQoNCg0KYGBgDQoNCmBgYHtyIHVzaW5nIHB1cnJyfQ0KZGF0YS5tID0gYXMuZGF0YS5mcmFtZSh0KG0uZGF0YSkpDQpkYXRhLm0gPSBkYXRhLm0gJT4lDQogICAgICAgIG11dGF0ZShyb3dfbnVtYmVyID0gcm93X251bWJlcigpKSAlPiUNCiAgICAgICAgc2VsZWN0KHJvd19udW1iZXIsIGV2ZXJ5dGhpbmcoKSkNCmRhdGEubQ0KbG9nbGlrX2Z1biA9IGZ1bmN0aW9uKGRmKSBzdW0obG9nKGRwb2lzKGFzLm51bWVyaWMoZGYpLCBsYW1iZGEgPSBleHAoMi4wNCkpKSkNCmxvZ2xpa19mdW4oYXMubnVtZXJpYyhkYXRhLm1bMyxdKSkNCg0KZGF0YS5uZXN0ZWQgPSBkYXRhLm0gJT4lDQogICAgICAgIGdyb3VwX2J5KHJvd19udW1iZXIpICU+JQ0KICAgICAgICBuZXN0KCkgJT4lDQogICAgICAgIG11dGF0ZShsb2dfbGlrID0gbWFwX2RibChkYXRhLCBsb2dsaWtfZnVuKSwNCiAgICAgICAgICAgICAgIG1lYW5fbG9nbGlrID0gbWVhbihsb2dfbGlrKSwNCiAgICAgICAgICAgICAgIGJpYXMgPSAtMTIwLjYgLSBtZWFuX2xvZ2xpaykNCmRhdGEubmVzdGVkDQpwbG90KGRlbnNpdHkoZGF0YS5uZXN0ZWQkYmlhcykpICsgYWJsaW5lKGEgPSBtZWFuKGRhdGEubmVzdGVkJGJpYXMpKQ0KDQpkYXRhLm5lc3RlZCAlPiUNCiAgICAgICAgc3VtbWFyaXNlKG1lYW4obG9nX2xpaykpDQoNCnFwbG90KHYubWxlLW1lYW4odi5tbGUpKQ0KDQoNCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIFdoYXQgaGFwcGVucw0KLSBjaGVjayBpZiB1c2luZyB4IGFzIGEgdmFyaWFibGVzIGlzIHVzZWZ1bA0KLSBib290c3RyYXAgKyBjaGlzcSB0byBjaGVjayB0aGUgcmVzdWx0cw0KDQoNCmBgYHtyIGxvYWR9DQpkID0gcmVhZC5jc3YoImRhdGEzYS5jc3YiKQ0KZA0KYGBgDQoNCmBgYHtyIGZpdH0NCmZpdDEgPSBnbG0oeSB+IDEsIGRhdGEgPSBkLCBmYW1pbHkgPSBwb2lzc29uKQ0KZml0MiA9IGdsbSh5IH4geCwgZGF0YSA9IGQsIGZhbWlseSA9IHBvaXNzb24pDQpzdW1tYXJ5KGZpdDEpDQoNCmBgYA0KDQpgYGB7ciBkZXZpYW5jZX0NCmZpdDEkZGV2aWFuY2UgLSBmaXQyJGRldmlhbmNlDQpgYGANCg0KIyBCb290c3RyYXANCmBgYHtyIGZ1bmN0aW9uc30NCmdldC5kZCA9IGZ1bmN0aW9uKGRhdGEpew0KICAgICAgICBuLnNhbXBsZSA9IG5yb3coZGF0YSkNCiAgICAgICAgeS5tZWFuID0gbWVhbihkYXRhJHkpDQogICAgICAgIGRhdGEkeS5ybmQgPXJwb2lzKG4uc2FtcGxlLCBsYW1iZGEgPSB5Lm1lYW4pDQogICAgICAgIGZpdDEgPSBnbG0oeS5ybmQgfiAxLCBkYXRhID0gZGF0YSwgZmFtaWx5ID0gcG9pc3NvbikNCiAgICAgICAgZml0MiA9IGdsbSh5LnJuZCB+IHgsIGRhdGEgPSBkYXRhLCBmYW1pbHkgPSBwb2lzc29uKQ0KICAgICAgICByZXR1cm4oZml0MSRkZXZpYW5jZSAtIGZpdDIkZGV2aWFuY2UpDQp9DQoNCnBiID0gZnVuY3Rpb24oZGF0YSwgbi5ib290c3RyYXApew0KICAgICAgICByZXBsaWNhdGUobi5ib290c3RyYXAsIGdldC5kZChkYXRhKSkNCn0NCg0KZGQxMiA9IHBiKGQsIG4uYm9vdHN0cmFwID0gMTAwMCkNCg0KYGBgDQoNCiMgcmVzdWx0IA0KYGBge3IgcmVzdWx0fQ0Kc3VtbWFyeShkZDEyKQ0Kew0KaGlzdChkZDEyLCAxMDApDQphYmxpbmUodiA9IDQuNSwgbHR5ID0gMikNCn0NCg0Kc3VtKGRkMTIgPj0gNC41KSAvMTAwMA0KcXVhbnRpbGUoZGQxMiwgMC45NSkNCg0KYGBgDQoNCiMgQ2hpc3ENCmBgYHtyIGNoaXNxfQ0KZml0MSA9IGdsbSh5IH4gMSwgZGF0YSA9IGQsIGZhbWlseSA9IHBvaXNzb24pDQpmaXQyID0gZ2xtKHkgfiB4LCBkYXRhID0gZCwgZmFtaWx5ID0gcG9pc3NvbikNCg0KYW5vdmEoZml0MSwgZml0MiwgdGVzdCA9ICJDaGlzcSIpDQoNCmBgYA0KDQo=</div>
 
 
 
