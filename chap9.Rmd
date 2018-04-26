@@ -1,0 +1,66 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# What happens
+- there was nothing to do in chap8
+- maybe some simulations?
+
+```{r library}
+require(rstan)
+
+```
+
+```{r load}
+load(url("http://hosho.ees.hokudai.ac.jp/~kubo/stat/iwanamibook/fig/gibbs/d.RData"))
+
+d
+qplot(x,y,data =d)
+```
+
+```{r stan model}
+data <- list(N = nrow(d),
+             X = d$x,
+             Y = d$y,
+             MeanX = mean(d$x))
+
+fit = stan(file ="model/chap9.stan", data = data, seed = 1234)
+
+```
+
+
+```{r diagnostics}
+require(ggmcmc)
+
+summary(fit)$summary
+fit
+
+```
+
+```{r plot results}
+ggmcmc(ggs(fit, inc_warmup = T, stan_include_auxiliar = T), file = "output/chap9-fit-traceplot.pdf", plot = 'traceplot')
+
+ggmcmc(ggs(fit), file = "output/chap9-fit-ggmcmc.pdf")
+
+```
+
+# plots
+```{r ms}
+ms = rstan::extract(fit)
+qplot(ms$beta1, ms$beta2, alpha = 0.01, color = "grey")
+
+
+```
+
+
+```{r}
+data.frame(ms)[1000:4000, ]
+
+```
+
+```{r}
+data.frame(summary(fit)$summary)
+
+```
+

@@ -1,0 +1,148 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# What happens
+- there was nothing to do in chap8
+- maybe some simulations?
+
+```{r library}
+require(rstan)
+
+```
+
+```{r load}
+d <- read.csv(url("http://hosho.ees.hokudai.ac.jp/~kubo/stat/iwanamibook/fig/hbm/data7a.csv"))
+d
+qplot(y,data =d)
+```
+
+```{r stan model}
+data <- list(N = nrow(d),
+             Y = d$y,
+             N_new = 100)
+
+fit = stan(file ="model/chap10.stan", data = data, seed = 1234)
+
+```
+
+
+```{r diagnostics}
+require(ggmcmc)
+
+summary(fit)$summary
+fit
+
+```
+
+```{r plot results}
+ggmcmc(ggs(fit, inc_warmup = T, stan_include_auxiliar = T), file = "output/chap10-fit-traceplot.pdf", plot = 'traceplot',
+       family = 'beta')
+?ggmcmc
+
+#ggmcmc(ggs(fit), file = "output/chap10-fit-ggmcmc.pdf")
+
+```
+
+# Get predictions
+```{r predictions}
+ms = rstan::extract(fit)
+data.frame.quantile.mcmc = function(x, y_mcmc){
+        probs = c(2.5, 25, 50, 75, 97.5)/100
+        qua = apply(y_mcmc,2,quantile)
+}
+
+matrix(unlist(apply(ms$y_new, 1, table)),ncol = 8)
+
+apply(ms$y_new, 1, table)
+
+one_row = ms$y_new[1,]
+table(one_row)
+
+?table
+
+        
+df = data.frame(ms$y_new)
+df %>%
+        mutate_all(as.factor) %>%
+        group_by(row_number()) %>%
+        nest
+
+ms_small = ms$y_new[1:10,]
+        
+```
+
+
+```{r}
+require(tidyverse)
+df = data.frame(ms_small)
+df %>%
+        mutate_all(as.factor) %>%
+        group_by(row_number()) %>%
+        nest 
+        mutate(n = map(data, table))
+
+        
+df
+
+?group_indices
+
+group_indices(mtcars, cyl)
+
+mtcars
+```
+
+```{r}
+square_data = data.frame(ms$y_new) %>%
+        mutate(row_number = row_number()) %>%
+        select(row_number, everything()) %>%
+        gather(key = column, value = number, -row_number) %>%
+        group_by(row_number, number) %>%
+        count %>%
+        ungroup %>%
+        spread(key = number, value = n, fill = 0) %>%
+        select(-row_number)
+
+square_data
+
+        
+
+?spread
+
+```
+
+```{r}
+
+data.frame.quantile.mcmc = function(x, y_mcmc){
+        probs = c(2.5, 25, 50, 75, 97.5)/100
+        qua = apply(y_mcmc,2,quantile)
+        
+}
+probs = c(2.5, 25, 50, 75, 97.5)/100
+qua = apply(square_data, 2, quantile, probs = probs)
+quat = data.frame(t(qua))
+colnames(quat) = c(paste0('p', probs*100))
+quat
+
+
+
+```
+
+```{r}
+quat$actual = table(d$y)
+quat
+
+```
+
+```{r}
+quat = quat %>%
+        mutate(x = row_number(),
+               actual = as.numeric(actual))
+ggplot(data = quat, aes(x = x)) +
+        geom_point(aes(y = actual)) + 
+        geom_ribbon(aes(ymin = p2.5, ymax = p97.5), fill = "black", alpha =1/6) +
+        geom_ribbon(aes(ymin = p25, ymax = p75), fill = "black", alpha = 2/6)
+
+```
+

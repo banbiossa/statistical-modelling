@@ -1,0 +1,8 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# What happens
+- there was nothing to do in chap8
+- maybe some simulations?

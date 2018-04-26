@@ -1,0 +1,176 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# What happens
+- check if using x as a variables is useful
+- bootstrap + chisq to check the results
+
+```{r libraries}
+require(tidyverse)
+
+```
+
+
+
+```{r load}
+d = read.csv("data4a.csv")
+d
+summary(d)
+```
+
+```{r qplot}
+qplot(x, y, data = d, colour = f)
+```
+
+# look at logistic functions
+```{r logistic}
+
+logistic = function(z) return(1/(1+exp(-z)))
+z = seq(-6, 6, 0.1)
+plot(z, logistic(z), type = "l")
+```
+
+```{r binomial}
+fit = glm(cbind(y, N-y) ~ x + f, data = d, family = binomial)
+summary(fit)
+```
+
+
+# Plot 
+```{r plot}
+
+g = ggplot(d, aes(x = x, y = y, colour = f)) + 
+        geom_point()
+
+# x=7:13
+x = seq(7, 13, by = 0.1)
+f = factor(c("C", "T"))
+d = 8
+
+data = expand.grid(x = x, f = f, N = N)
+data
+
+data$y_pred = predict.glm(fit, newdata = data, type = "response")
+
+?sapply
+data$linear = fit$coefficients[1] + fit$coefficients[2]*data$x + fit$coefficients[3]*ifelse(data$f == "C", 0, 1)
+data$exp_linear = exp(-data$linear)
+data$q = 1/(1+data$exp_linear)
+data$N_pred = data$N * data$q
+
+?predict.glm
+
+g
+```
+
+```{r plot predictions}
+data
+g + 
+        geom_line(aes(x = x, y = N_pred, colour = f), data = data)
+
+```
+
+```{r MASS}
+require(MASS)
+stepAIC(fit)
+
+```
+
+
+# With interaction
+```{r interaction}
+fit.xf = glm(cbind(y, N-y) ~ x*f, family = binomial, data = d)
+summary(fit.xf)
+
+
+stepAIC(fit.xf)
+```
+
+
+# Plot the results with and without interaction
+```{r with interaction}
+data$q2 = predict.glm(fit.xf, newdata = data, type = "response")
+data$N_pred2 = data$N * data$q2
+data
+
+ggplot(data, aes(x = x)) + 
+        geom_line(aes(y = N_pred, colour = f)) + 
+        geom_line(aes(y = N_pred2, colour = f), linetype = "dotted")
+
+```
+
+
+
+
+# the data about offsets
+```{r offset}
+d2 = read.csv("data4b.csv")
+d2
+qplot(A, y, data = d2, colour = x) + 
+        scale_colour_gradient(low = "black", high = "white")
+
+```
+
+```{r offset fit}
+fit.offset = glm(y ~ x, offset = log(A), family = poisson, data = d2)
+summary(fit.offset)
+
+```
+
+
+# Plot 
+```{r predict}
+d2$linear = fit.offset$coefficients[1] + fit.offset$coefficients[2] *d2$x + log(d2$A)
+data2 = expand.grid(A = seq(3,20,0.1), x = seq(0,1,0.2))
+data2$linear = fit.offset$coefficients[1] + fit.offset$coefficients[2] *data2$x + log(data2$A)
+
+data2$lambda = exp(data2$linear)
+data2$predict = predict.glm(fit.offset, newdata = data2, type = "response")
+data2
+
+```
+
+```{r plot}
+ggplot(d2, aes(x = A)) + 
+        geom_point(aes(y = y, colour = x)) + 
+        scale_colour_gradient(low = "black", high = "white") +
+        geom_line(aes(x = A, y = lambda, colour = x, group = x), data = data2)
+```
+
+
+# Gaama distributions
+```{r gamma}
+load("d.RData")
+d
+p
+qplot(x,y,data =d)
+
+```
+
+```{r gamma fit}
+fit.gamma = glm(y ~ log(x), family=Gamma(link="log"), data =d)
+summary(fit.gamma)
+
+data = expand.grid(x = seq(0, 0.8, 0.05))
+data$pred = predict.glm(fit.gamma, newdata = data, type = "response")
+data = data.frame(x = seq(0, 0.8, 0.05), predict.glm(fit.gamma, newdata = data, type = "response", se.fit = TRUE))
+
+data$upper97.5 = data$fit + 1.96 *data$se.fit
+data$lower97.5 = data$fit - 1.96 *data$se.fit
+data
+```
+
+```{r confint}
+confint(fit.gamma)
+```
+
+```{r plot}
+ggplot(d, aes(x = x)) + 
+        geom_point(aes(y = y)) + 
+        geom_ribbon(aes(ymin = lower97.5, ymax = upper97.5), fill = "grey70", data = data, alpha =0.5) +
+        geom_line(aes(x = x, y = fit), data = data)
+
+```
+

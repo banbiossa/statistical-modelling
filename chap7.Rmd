@@ -1,0 +1,91 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# What happens
+- check if using x as a variables is useful
+- bootstrap + chisq to check the results
+
+```{r libraries}
+require(tidyverse)
+
+```
+
+
+
+```{r load}
+d = read.csv("data.csv")
+d
+summary(d)
+```
+
+```{r qplot}
+ggplot(d, aes(x = x, y = y)) + 
+        geom_jitter(height = 0, shape= 1, width = 0.1)
+```
+
+```{r d4}
+d4 = d[d$x == 4,]
+d4
+qplot(y, data =d4)
+
+```
+
+```{r glmmml}
+require(glmmML)
+
+fit.glmm = glmmML(cbind(y, N-y) ~ x, data = d, family = binomial, cluster = id)
+
+summary(fit.glmm)
+```
+
+```{r prediction}
+?glmmML
+
+fit.glmm$coefficients
+fit.glmm$sigma
+
+set.seet(1234)
+d$r = rnorm(100, 0, fit.glmm$sigma)
+
+d$linear = fit.glmm$coefficients[1] + fit.glmm$coefficients[2]*d$x + d$r
+d$q = 1/(1+exp(-d$linear))
+d
+```
+
+
+# group by x
+```{r grouped by x}
+d4_actual = d4 %>%
+        group_by(x, y) %>%
+        count
+qplot(y, n, data = d4_actual, ylim = c(0,5))
+
+```
+
+# give the prediction of p[0] - p[8] to each row
+```{r predict 0 to 8}
+dbinom(0:8, 8, 0.26)
+get_dbinom = function(q){
+        return(dbinom(0:8, 8, q))
+}
+?rbinom
+
+d = d %>%
+        mutate(p = map(q,get_dbinom))
+
+d4 = d %>%
+        filter(x == 4)
+
+d4_actual$n_pred = apply(matrix(unlist(d4$p), ncol = 9), 2, sum)
+d4_actual
+
+ggplot(d4_actual, aes(x = y)) +
+        geom_point(aes(y = n)) + 
+        geom_line(aes(y = n_pred, size =2), colour = "#89BDDE") + 
+        ylim(c(0,5))
+
+```
+
+
