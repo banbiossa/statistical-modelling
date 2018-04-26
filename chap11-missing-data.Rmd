@@ -1,0 +1,85 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+# What to do
+- chapter 11 of staistical modelling
+```{r libraries}
+require(rstan)
+
+```
+
+```{r load}
+load("Y.RData")
+
+m
+Y
+missing = c(6,8,11,12,27:30)
+d = data.frame(x = 1:length(Y), Y  = Y)
+d$is_missing = d$x %in% missing
+d[d$is_missing,]$Y = NA
+d
+qplot(x, Y, data = d, colour = is_missing)
+
+```
+
+```{r what is x}
+summary(d)
+var(d)
+var(d$Y)
+mean(d$Y)
+
+```
+
+```{r stan}
+data = list(N_site = length(Y), Y = d$Y)
+
+fit = stan(file ="model/chap11_1dim_spatial_correlation.stan", data = data, seed = 1234)
+```
+
+```{r get inside}
+ms = rstan::extract(fit)
+
+summary(fit)
+```
+
+
+```{r make a plot}
+ms$Y_mean #4000*50
+
+probs = c(2.5, 25, 50, 75, 97.5)/100
+qua = apply(ms$Y_mean, 2, quantile, probs = probs)
+qua
+quat = data.frame(t(qua))
+colnames(quat) = c(paste0('p', probs*100))
+
+
+data.frame.quantile.mcmc = function(x, y_mcmc){
+        probs = c(2.5, 25, 50, 75, 97.5)/100
+        qua = apply(ms$Y_mean, 2, quantile, probs = probs)
+        d = data.frame(X = x, t(qua))
+        colnames(d) = c("X", paste0('p', probs*100))
+        return(d)
+}
+
+d_est = data.frame.quantile.mcmc(1:50, ms$Y_mean)
+d_est
+
+ggplot.5quantile = function(data){
+        p = ggplot(data = data, aes(x = X, y = p50))
+        p = p + theme_bw(base_size = 18)
+        p = p + geom_ribbon(aes(ymin = p2.5, ymax = p97.5), fill = "black", alpha = 1/6)
+        p = p + geom_ribbon(aes(ymin = p25, ymax = p75), fill = "black", alpha = 2/6)
+        p = p + geom_line(size = 1)
+        return(p)
+}
+
+p = ggplot.5quantile(d_est)
+p
+
+p + geom_point(data = d, aes(x = x, y = Y), shape = 1, size = 3)
+
+d
+```

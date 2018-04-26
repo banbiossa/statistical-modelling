@@ -1,0 +1,218 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+# What to do
+- chapter 11 of staistical modelling
+```{r libraries}
+require(rstan)
+
+```
+
+```{r load}
+load("Y.RData")
+
+m
+Y
+d = data.frame(x = 1:length(Y), Y  = Y)
+d
+qplot(x, Y, data = d)
+
+```
+
+```{r what is x}
+summary(d)
+var(d)
+var(d$Y)
+mean(d$Y)
+
+```
+
+```{r stan}
+data = list(N_site = length(Y), Y = Y)
+
+fit = stan(file ="model/chap11_1dim_spatial_correlation.stan", data = data, seed = 1234)
+```
+
+```{r get inside}
+ms = rstan::extract(fit)
+
+summary(fit)
+```
+
+
+```{r make a plot}
+ms$Y_mean #4000*50
+
+probs = c(2.5, 25, 50, 75, 97.5)/100
+qua = apply(ms$Y_mean, 2, quantile, probs = probs)
+qua
+quat = data.frame(t(qua))
+colnames(quat) = c(paste0('p', probs*100))
+
+
+data.frame.quantile.mcmc = function(x, y_mcmc){
+        probs = c(2.5, 25, 50, 75, 97.5)/100
+        qua = apply(ms$Y_mean, 2, quantile, probs = probs)
+        d = data.frame(X = x, t(qua))
+        colnames(d) = c("X", paste0('p', probs*100))
+        return(d)
+}
+
+d_est = data.frame.quantile.mcmc(1:50, ms$Y_mean)
+d_est
+
+ggplot.5quantile = function(data){
+        p = ggplot(data = data, aes(x = X, y = p50))
+        p = p + theme_bw(base_size = 18)
+        p = p + geom_ribbon(aes(ymin = p2.5, ymax = p97.5), fill = "black", alpha = 1/6)
+        p = p + geom_ribbon(aes(ymin = p25, ymax = p75), fill = "black", alpha = 2/6)
+        p = p + geom_line(size = 1)
+        return(p)
+}
+
+p = ggplot.5quantile(d_est)
+p
+
+p + geom_point(data = d, aes(x = x, y = Y), shape = 1, size = 3)
+
+d
+```
+
+
+```{r look at the variance in s}
+quantile(ms$s_r, probs = c(0, probs, 1))
+
+```
+
+# the effects of s
+- get the sequence with the smallest s from the 4000 samples
+
+```{r small_var}
+require(tidyverse)
+d_s_r = data.frame(seq = 1:4000, s_r = ms$s_r)
+d_s_r %>%
+        arrange(s_r)
+
+small_sr = c(1454, 523, 2895)
+
+d_s_r %>%
+        arrange(-s_r)
+
+big_sr = c(3512, 1615, 2610)
+
+d_y_mean = data.frame(seq = 1:4000, y_mean = ms$Y_mean)
+d_y_mean
+
+d_smallvar = d_y_mean %>%
+        filter(seq %in% small_sr)
+
+d_smallvar
+
+d_largevar = d_y_mean %>%
+        filter(seq %in% big_sr)
+
+d_smallvar
+
+```
+
+```{r plot smallvar}
+d
+
+d_small_var = data.frame(t(d_smallvar %>% select(-seq)))
+d_small_var$x = 1:50
+d_small_var
+
+ggplot(data = d, aes(x = x)) + 
+        geom_point(aes(y = Y), shape = 1, size = 3) + 
+        geom_line(aes(y = X1), data = d_small_var) + 
+        geom_line(aes(y = X2), data = d_small_var) + 
+        geom_line(aes(y = X3), data = d_small_var)
+```
+
+
+```{r plot largevar}
+d
+
+d_largevar= data.frame(t(d_largevar%>% select(-seq)))
+d_largevar$x = 1:50
+d_largevar
+
+ggplot(data = d, aes(x = x)) + 
+        geom_point(aes(y = Y), shape = 1, size = 3) + 
+        geom_line(aes(y = X1), data = d_largevar) + 
+        geom_line(aes(y = X2), data = d_largevar) + 
+        geom_line(aes(y = X3), data = d_largevar)
+```
+
+
+# Make a twoD correlation
+```{r stan2D}
+
+fit = stan(file ="model/chap11_2dim_spatial_correlation.stan", data = data, seed = 1234)
+
+```
+
+
+```{r whats inside}
+ms = rstan::extract(fit)
+
+summary(fit)
+```
+
+
+```{r make a plot again}
+ms$Y_mean #4000*50
+
+probs = c(2.5, 25, 50, 75, 97.5)/100
+qua = apply(ms$Y_mean, 2, quantile, probs = probs)
+qua
+quat = data.frame(t(qua))
+colnames(quat) = c(paste0('p', probs*100))
+
+
+data.frame.quantile.mcmc = function(x, y_mcmc){
+        probs = c(2.5, 25, 50, 75, 97.5)/100
+        qua = apply(ms$Y_mean, 2, quantile, probs = probs)
+        d = data.frame(X = x, t(qua))
+        colnames(d) = c("X", paste0('p', probs*100))
+        return(d)
+}
+
+d_est = data.frame.quantile.mcmc(1:50, ms$Y_mean)
+d_est
+
+ggplot.5quantile = function(data){
+        p = ggplot(data = data, aes(x = X, y = p50))
+        p = p + theme_bw(base_size = 18)
+        p = p + geom_ribbon(aes(ymin = p2.5, ymax = p97.5), fill = "black", alpha = 1/6)
+        p = p + geom_ribbon(aes(ymin = p25, ymax = p75), fill = "black", alpha = 2/6)
+        p = p + geom_line(size = 1)
+        return(p)
+}
+
+p = ggplot.5quantile(d_est)
+p
+
+p + geom_point(data = d, aes(x = x, y = Y), shape = 1, size = 3)
+
+d
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
